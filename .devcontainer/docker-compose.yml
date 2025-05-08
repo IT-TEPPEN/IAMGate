@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspaces:cached # Mount the project directory
+      - ~/.bash_history:/home/vscode/.bash_history:cached # Update path for vscode user
+    command: sleep infinity
+    networks:
+      - devcontainer-network
+    depends_on: # Add dependency on the db service
+      - db
+    environment: # Add environment variables for the app service
+      - DATABASE_URL=postgres://iamgate_user:iamgate_password@db:5432/iamgate?sslmode=disable
+
+  db: # Add the database service
+    image: postgres:16 # Use a specific version of postgres
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data # Persist data
+    networks:
+      - devcontainer-network
+    environment:
+      POSTGRES_DB: iamgate
+      POSTGRES_USER: iamgate_user
+      POSTGRES_PASSWORD: iamgate_password
+
+networks:
+  devcontainer-network:
+    driver: bridge
+
+volumes: # Define the named volume
+  postgres-data:
