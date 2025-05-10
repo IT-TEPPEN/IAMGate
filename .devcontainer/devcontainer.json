@@ -23,7 +23,8 @@
         "bierner.markdown-preview-github-styles",
         "bierner.markdown-mermaid",
         "ms-python.python",
-        "ms-python.black-formatter"
+        "ms-python.black-formatter",
+        "LittleFoxTeam.vscode-python-test-adapter"
       ],
       "settings": {
         "editor.formatOnSave": true,
