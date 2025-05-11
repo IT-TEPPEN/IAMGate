@@ -1,6 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import List
-from ..entity import DocumentSiteProperty, DocumentSiteContent, EDocumentType
+from ..entity import (
+    DocumentSiteProperty,
+    DocumentSiteContent,
+    EDocumentType,
+    DocumentSiteCrawlingCondition,
+)
+from contextlib import AbstractContextManager
 
 from src.domain.share.value_object import VSearchCondition
 
@@ -98,5 +104,66 @@ class IDocumentSiteRepository(ABC):
 
         :param document_id: The ID of the document site content to delete.
         :return: The deleted document site content.
+        """
+        pass
+
+    @abstractmethod
+    def get_crawling_site_condition(
+        self, document_id: str
+    ) -> DocumentSiteCrawlingCondition | None:
+        """
+        Retrieve the crawling condition for a document site property.
+
+        :param document_id: The ID of the document site property.
+        :return: The crawling condition for the document site property.
+        """
+        pass
+
+    @abstractmethod
+    def list_crawling_site_conditions(
+        self,
+        document_type: EDocumentType,
+        search_condition: VSearchCondition | None = None,
+    ) -> list[DocumentSiteCrawlingCondition]:
+        """
+        Retrieve all crawling conditions for a document site property.
+
+        :return: A list of crawling conditions for the document site property.
+        """
+        pass
+
+    @abstractmethod
+    def save_crawling_site_condition(
+        self, document_site_crawling_condition: DocumentSiteCrawlingCondition
+    ) -> DocumentSiteCrawlingCondition:
+        """
+        Save the crawling condition for a document site property.
+
+        :param document_site_crawling_condition: The crawling condition to save.
+        :return: The saved crawling condition.
+        """
+        pass
+
+    @abstractmethod
+    def delete_crawling_site_condition(self, document_id: str) -> None:
+        """
+        Delete the crawling condition for a document site property.
+
+        :param document_id: The ID of the document site property.
+        :return: The deleted crawling condition.
+        """
+        pass
+
+    @abstractmethod
+    def pick_and_lock_crawling_target(
+        self, num_pick: int = 5
+    ) -> AbstractContextManager[DocumentSiteProperty | None]:
+        """
+        Pick up to `num_pick` crawlable SiteProperty, try to acquire advisory lock for each in order,
+        yield the first one that can be locked (or None if none), and auto-release lock after crawling.
+        Usage:
+            with repo.pick_and_lock_crawling_target(num_pick=5) as site_property:
+                if site_property:
+                    # do crawling
         """
         pass
