@@ -325,10 +325,9 @@ class SitePostgreSQLRepository(IDocumentSiteRepository):
                         (latest_content_subq.c.last_acquired_at.is_(None))
                         | (
                             latest_content_subq.c.last_acquired_at
-                            + func.make_interval(
-                                secs=(
-                                    MSiteCrawlingCondition.crawl_interval_minutes * 60
-                                )
+                            + (
+                                MSiteCrawlingCondition.crawl_interval_minutes
+                                * text("INTERVAL '1 minute'")
                             )
                             <= func.now()
                         )

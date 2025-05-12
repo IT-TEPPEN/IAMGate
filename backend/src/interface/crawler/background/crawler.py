@@ -17,36 +17,24 @@ class Crawler:
     def run(self):
         while True:
             try:
-                self.crawl_all_service_actions()
+                self.usecase.update_actions_list_page_properties()
             except Exception as e:
-                print(f"[ERROR] クローリング処理で例外: {e}")
-            # 60秒ごとにクローリングを試みる
-            time.sleep(60)
+                print(f"[ERROR] クローリング処理で例外1: {e}")
 
-    def extract_side_nav_links(self):
-        try:
-            content = self.usecase.get_document_top_site()
-            print(content)
-            parser = ServiceLinkHTMLParser()
-            parser.feed(content.content)
-            links = list(parser.links)
-            print(f"[INFO] サイドナビのlink_ページリンク数: {len(links)}")
-            return links
-        except Exception as e:
-            print(f"[ERROR] サイドナビページリンク抽出失敗: {e}")
-            return []
+            for i in range(1440):
+                try:
+                    with self.usecase.get_actions_list_page_property_crawling() as site_property:
+                        if site_property is None:
+                            print("[INFO] クローリング対象は存在しません。")
+                        else:
+                            print(f"[INFO] クローリング対象: {site_property.url}")
+                            self.crawl_service_action_page(site_property.url)
+                except Exception as e:
+                    print(f"[ERROR] クローリング処理で例外2: {e}")
+                finally:
+                    time.sleep(5)
 
-    def crawl_all_service_actions(self):
-        links = self.extract_side_nav_links()
-        all_actions = {}
-        for link in links[:3]:
-            actions = self.crawl_service_action_page(link)
-            all_actions[link] = actions
-            # セキュリティ・負荷対策: 1秒待機
-            time.sleep(1)
-        return all_actions
-
-    def crawl_service_action_page(self, service_url):
+    def crawl_service_action_page(self, service_url: str):
         base_url = "https://docs.aws.amazon.com/service-authorization/latest/reference/"
         full_url = (
             base_url + service_url[len("reference/") :]

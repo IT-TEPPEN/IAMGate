@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+from contextlib import AbstractContextManager
 from . import dto
+from src.domain.document_site.entity import DocumentSiteProperty
 
 
 class IDocumentSiteUseCase(ABC):
@@ -20,5 +22,14 @@ class IDocumentSiteUseCase(ABC):
     ) -> None:
         """
         Update the properties of the action list pages.
+        """
+        pass
+
+    @abstractmethod
+    def get_actions_list_page_property_crawling(
+        self,
+    ) -> AbstractContextManager[DocumentSiteProperty | None]:
+        """
+        Crawl the action list page properties.
         """
         pass

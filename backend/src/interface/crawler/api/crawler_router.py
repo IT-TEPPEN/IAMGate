@@ -1,8 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
-from ..background import CrawlerHandler, exc
-
-from src.usecase.document_site import IDocumentSiteUseCase
+from ..background import CrawlerHandler
 
 
 def setup_crawler_router(crawlerHandler: CrawlerHandler) -> APIRouter:

@@ -21,7 +21,7 @@ class AwsIamActionListLinksHTMLParser(HTMLParser):
         if tag == "a":
             for attr in attrs:
                 if attr[0] == "href" and attr[1].startswith("./list_"):
-                    self.links.add(attr[1])
+                    self.href = attr[1]
 
     def handle_endtag(self, tag):
         pass
@@ -41,9 +41,13 @@ class AwsIamActionListLinksHTMLParser(HTMLParser):
         if not self.links:
             return []
 
-        return map(
-            lambda link: self.__convert_to_document_site_property(link),
-            self.links,
+        print(f"[INFO] Links: {self.links}")
+
+        return list(
+            map(
+                lambda link: self.__convert_to_document_site_property(link),
+                self.links,
+            )
         )
 
     def __convert_to_document_site_property(self, link: str) -> DocumentSiteProperty:
@@ -57,6 +61,8 @@ class AwsIamActionListLinksHTMLParser(HTMLParser):
 
         if url.startswith("./"):
             url = url[2:]
+
+        print(f"[INFO] URL: {url}")
 
         return DocumentSiteProperty.new(
             document_type=EDocumentType.アクション一覧ページ,

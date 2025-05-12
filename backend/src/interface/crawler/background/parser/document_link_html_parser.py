@@ -10,8 +10,6 @@ class ServiceLinkHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == "a":
             for attr in attrs:
-                if attr[0] == "href":
-                    print(f"[DEBUG] nav内aタグhref: {attr[1]}")
                 if attr[0] == "href" and attr[1].startswith("./list_"):
                     self.links.add(attr[1])
 

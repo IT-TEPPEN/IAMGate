@@ -32,11 +32,9 @@ class DocumentSiteUseCase(IDocumentSiteUseCase):
         Retrieve the top document site.
         """
         # Get the document site properties
-        document_site_properties = (
-            self.document_site_repository.get_document_site_properties(
-                document_type=EDocumentType.トップページ,
-                search_condition=VSearchCondition(limit=1),
-            )
+        document_site_properties = self.document_site_repository.get_document_site_properties(
+            document_type=EDocumentType.トップページ,
+            # search_condition=VSearchCondition(limit=1),
         )
 
         if len(document_site_properties) == 0:
@@ -95,17 +93,39 @@ class DocumentSiteUseCase(IDocumentSiteUseCase):
             top_document_site_property = document_site_properties[0]
 
         # Get the action list page properties
-        action_list_page_properties = (
+        action_list_page_properties = list(
             self.document_site_adapter.get_aws_iam_actions_page_properties(
                 top_page_property=top_document_site_property
             )
         )
 
-        if len(action_list_page_properties) == 0:
-            raise exc.FailToGetContentException(
-                f"Action list page properties not found for\n - property ID: {top_document_site_property.id}\n - URL: {top_document_site_property.url}"
+        existing_action_list_page_properties = (
+            self.document_site_repository.get_document_site_properties(
+                document_type=EDocumentType.アクション一覧ページ,
             )
+        )
+        existing_action_list_page_urls = [
+            existing_action_list_page_property.url
+            for existing_action_list_page_property in existing_action_list_page_properties
+        ]
+
+        additional_action_list_page_properties = [
+            action_list_page_property
+            for action_list_page_property in action_list_page_properties
+            if action_list_page_property.url not in existing_action_list_page_urls
+        ]
+
+        if len(additional_action_list_page_properties) == 0:
+            print("[INFO] No action list page properties found. Skipping update.")
 
         self.document_site_repository.save_document_site_properties(
-            action_list_page_properties
+            additional_action_list_page_properties
         )
+
+    def get_actions_list_page_property_crawling(self):
+        """
+        Crawl the action list page properties.
+
+        :param top_page_property: The top page property.
+        """
+        return self.document_site_repository.pick_and_lock_crawling_target(5)

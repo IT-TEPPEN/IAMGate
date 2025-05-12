@@ -39,7 +39,7 @@ def setup() -> FastAPI:
     router_v1 = APIRouter()
 
     router_v1.include_router(
-        setup_crawler_router(usecase), prefix="/crawler", tags=["crawler"]
+        setup_crawler_router(crawlerHandler), prefix="/crawler", tags=["crawler"]
     )
 
     # Include routers
