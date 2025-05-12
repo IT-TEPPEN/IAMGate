@@ -1,4 +1,4 @@
-from sqlmodel import Field, Session, SQLModel, select
+from sqlmodel import Session, select, func
 from sqlalchemy.engine import Engine
 from sqlalchemy import text
 from ..model import MSiteProperty, MSiteContent
@@ -14,6 +14,7 @@ from src.domain.document_site.entity.document_site_crawling_condition import (
     DocumentSiteCrawlingCondition,
 )
 from src.domain.share.value_object import VSearchCondition
+from src.util.id import lock_id_from_str
 from contextlib import contextmanager
 from typing import Generator
 
@@ -213,16 +214,11 @@ class SitePostgreSQLRepository(IDocumentSiteRepository):
             )
             result = session.exec(statement)
             row = result.first()
+
             if row is None:
                 return None
-            return DocumentSiteCrawlingCondition(
-                site_property_id=row.site_property_id,
-                is_active=getattr(row, "is_active", True),
-                force_crawl=row.force_crawl,
-                crawl_interval_minutes=row.crawl_interval_minutes,
-                created_at=row.created_at,
-                updated_at=row.updated_at,
-            )
+
+            return row.to_entity()
 
     def list_crawling_site_conditions(
         self,
@@ -252,17 +248,7 @@ class SitePostgreSQLRepository(IDocumentSiteRepository):
                 )
             result = session.exec(statement)
             rows = result.all()
-            return [
-                DocumentSiteCrawlingCondition(
-                    site_property_id=row.site_property_id,
-                    is_active=getattr(row, "is_active", True),
-                    force_crawl=row.force_crawl,
-                    crawl_interval_minutes=row.crawl_interval_minutes,
-                    created_at=row.created_at,
-                    updated_at=row.updated_at,
-                )
-                for row in rows
-            ]
+            return [row.to_entity() for row in rows]
 
     def save_crawling_site_condition(
         self, document_site_crawling_condition: DocumentSiteCrawlingCondition
@@ -274,13 +260,8 @@ class SitePostgreSQLRepository(IDocumentSiteRepository):
         :return: The saved crawling site condition.
         """
         with Session(self.engine) as session:
-            db_obj = MSiteCrawlingCondition(
-                site_property_id=document_site_crawling_condition.site_property_id,
-                # is_active is not in DB, but included for future-proofing
-                force_crawl=document_site_crawling_condition.force_crawl,
-                crawl_interval_minutes=document_site_crawling_condition.crawl_interval_minutes,
-                created_at=document_site_crawling_condition.created_at,
-                updated_at=document_site_crawling_condition.updated_at,
+            db_obj = MSiteCrawlingCondition.from_entity(
+                site_crawling_condition=document_site_crawling_condition,
             )
             session.merge(db_obj)
             session.commit()
@@ -319,25 +300,54 @@ class SitePostgreSQLRepository(IDocumentSiteRepository):
         picked_property = None
         try:
             with Session(self.engine) as s:
+                latest_content_subq = (
+                    select(
+                        MSiteContent.id.label("site_property_id"),
+                        func.max(MSiteContent.acquired_at).label("last_acquired_at"),
+                    )
+                    .group_by(MSiteContent.id)
+                    .subquery()
+                )
+
+                # Main query: join property, crawling condition, and latest content
                 statement = (
                     select(MSiteProperty)
                     .join(
                         MSiteCrawlingCondition,
                         MSiteProperty.id == MSiteCrawlingCondition.site_property_id,
                     )
-                    .where(MSiteCrawlingCondition.force_crawl == True)
+                    .outerjoin(
+                        latest_content_subq,
+                        MSiteProperty.id == latest_content_subq.c.site_property_id,
+                    )
+                    .where(MSiteCrawlingCondition.is_active == True)
+                    .where(
+                        (latest_content_subq.c.last_acquired_at.is_(None))
+                        | (
+                            latest_content_subq.c.last_acquired_at
+                            + func.make_interval(
+                                secs=(
+                                    MSiteCrawlingCondition.crawl_interval_minutes * 60
+                                )
+                            )
+                            <= func.now()
+                        )
+                    )
+                    .order_by(latest_content_subq.c.last_acquired_at.asc().nullsfirst())
                     .limit(num_pick)
                 )
                 result = s.exec(statement)
                 site_properties = result.all()
                 for prop in site_properties:
-                    lock_id_candidate = int(str(prop.id).replace("-", ""), 16) % (2**31)
+                    lock_id_candidate = lock_id_from_str(
+                        f"SitePropertyID:{str(prop.id)}"
+                    )
                     session_candidate = Session(self.engine)
                     lock_result = session_candidate.exec(
                         text("SELECT pg_try_advisory_lock(:id)"),
                         {"id": lock_id_candidate},
                     )
-                    lock_result_value = lock_result.first()
+                    lock_result_value = lock_result.fetchone()
                     if lock_result_value and lock_result_value[0]:
                         picked_property = DocumentSiteProperty.reconstruct(
                             id=prop.id,
