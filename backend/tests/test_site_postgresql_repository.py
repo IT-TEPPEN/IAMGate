@@ -10,7 +10,7 @@ from src.infrastructure.site.repository.site_postgresql_repository import (
 )
 from src.infrastructure.site.model import MSiteProperty, MSiteContent
 from src.infrastructure.site.model.site_crawling_condition import MSiteCrawlingCondition
-from src.domain.document_site.entity import EDocumentType, DocumentSiteProperty
+from src.domain.document_site.entity import EDocumentType
 
 
 @pytest.fixture(scope="session")
