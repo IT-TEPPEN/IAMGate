@@ -11,20 +11,17 @@ CRAWL_URL = "https://docs.aws.amazon.com/service-authorization/latest/reference/
 
 
 class Crawler:
-    def __init__(
-        self, usecase: IDocumentSiteUseCase, crawler_stop_event: threading.Event
-    ):
-        self.crawler_stop_event = crawler_stop_event
+    def __init__(self, usecase: IDocumentSiteUseCase):
         self.usecase = usecase
 
     def run(self):
-        while not self.crawler_stop_event.is_set():
-            all_actions = self.crawl_all_service_actions()
-
-            for _ in range(86400):
-                if self.crawler_stop_event.is_set():
-                    break
-                time.sleep(1)
+        while True:
+            try:
+                self.crawl_all_service_actions()
+            except Exception as e:
+                print(f"[ERROR] クローリング処理で例外: {e}")
+            # 60秒ごとにクローリングを試みる
+            time.sleep(60)
 
     def extract_side_nav_links(self):
         try:
@@ -72,41 +69,19 @@ class Crawler:
             return []
 
 
-class BackgroundTaskManager:
-    def __init__(self):
-        self.tasks = []
-
-    def add_task(self, task):
-        self.tasks.append(task)
-
-    def run_tasks(self):
-        for task in self.tasks:
-            task.start()
-            task.join()
-
-
 class CrawlerHandler:
     def __init__(self, usecase: IDocumentSiteUseCase):
         self.crawler_thread = None
-        self.crawler_stop_event = threading.Event()
         self.usecase = usecase
 
     def start(self):
         if self.crawler_thread and self.crawler_thread.is_alive():
             raise exc.AlreadyCrawlerRunningException()
-        self.crawler_stop_event.clear()
         crawler = Crawler(
             usecase=self.usecase,
-            crawler_stop_event=self.crawler_stop_event,
         )
         self.crawler_thread = threading.Thread(target=crawler.run, daemon=True)
         self.crawler_thread.start()
-
-    def stop(self):
-        if not self.crawler_thread or not self.crawler_thread.is_alive():
-            raise exc.NotRunningCrawlerException()
-        self.crawler_stop_event.set()
-        self.crawler_thread.join()
 
     def get_status(self):
         return self.crawler_thread is not None and self.crawler_thread.is_alive()
