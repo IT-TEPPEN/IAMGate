@@ -43,6 +43,8 @@ class Crawler:
         try:
             parser = IAMActionHTMLParser()
             parser.feed(content)
+            print(f"[INFO] Service Name   : {parser.service_name}")
+            print(f"[INFO] Service Prefix : {parser.service_prefix}")
             for row in parser.rows[:10]:
                 print(f"{row}")
             return parser.rows
