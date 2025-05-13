@@ -39,13 +39,12 @@ class TableReader:
                     self.cells[r][c] = {}
 
     def add_data(self, data):
-        if self.row_index < 3:
-            print(
-                f"row_index: {self.row_index}, col_index: {self.col_index}, data: {data}"
-            )
         for r in range(self.row_index, self.row_index + self.rowspan):
             for c in range(self.col_index, self.col_index + self.colspan):
-                self.cells[r][c]["data"] = data
+                if "data" not in self.cells[r][c]:
+                    self.cells[r][c]["data"] = data
+                else:
+                    self.cells[r][c]["data"] += f",{data}"
 
     def add_link(self, link):
         for r in range(self.row_index, self.row_index + self.rowspan):
