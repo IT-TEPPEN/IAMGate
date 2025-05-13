@@ -44,8 +44,8 @@ class Crawler:
             parser = IAMActionHTMLParser()
             parser.feed(content)
             # 例: 最初の3件だけ出力
-            for row in parser.rows[:3]:
-                print(f"[SERVICE PAGE] {service_url} : {row}")
+            for row in parser.rows[:10]:
+                print(f"{row}")
             return parser.rows
         except Exception as e:
             print(
