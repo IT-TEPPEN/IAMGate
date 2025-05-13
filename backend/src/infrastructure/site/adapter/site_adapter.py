@@ -27,7 +27,6 @@ class DocumentSiteAdapter(IDocumentSiteAdapter):
         return DocumentSiteContent.new(
             id=property.id,
             content=response.text,
-            acquired_at=property.updated_at,
         )
 
     def get_aws_iam_actions_page_properties(self, top_page_property):

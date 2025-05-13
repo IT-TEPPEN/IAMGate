@@ -142,6 +142,20 @@ class SitePostgreSQLRepository(IDocumentSiteRepository):
             session.delete(document_site_property)
             session.commit()
 
+    def clear_actions_pages(self):
+        """
+        Delete all action list page properties.
+        """
+        with Session(self.engine) as session:
+            statement = select(MSiteProperty).where(
+                MSiteProperty.document_type == EDocumentType.アクション一覧ページ.value
+            )
+            result = session.exec(statement)
+            document_site_properties = result.all()
+            for document_site_property in document_site_properties:
+                session.delete(document_site_property)
+            session.commit()
+
     def get_document_site_content(self, document_id):
         """
         Retrieve a document site content by its ID.
@@ -341,11 +355,15 @@ class SitePostgreSQLRepository(IDocumentSiteRepository):
                     lock_id_candidate = lock_id_from_str(
                         f"SitePropertyID:{str(prop.id)}"
                     )
+                    print(
+                        f"Trying to acquire lock for {prop.id} with lock_id {lock_id_candidate}"
+                    )
                     session_candidate = Session(self.engine)
                     lock_result = session_candidate.exec(
                         text("SELECT pg_try_advisory_lock(:id)"),
-                        {"id": lock_id_candidate},
+                        params={"id": lock_id_candidate},
                     )
+                    print(f"Lock result: {lock_result}")
                     lock_result_value = lock_result.fetchone()
                     if lock_result_value and lock_result_value[0]:
                         picked_property = DocumentSiteProperty.reconstruct(
@@ -364,7 +382,9 @@ class SitePostgreSQLRepository(IDocumentSiteRepository):
             yield picked_property
         finally:
             if session and lock_id is not None:
-                session.exec(text("SELECT pg_advisory_unlock(:id)"), {"id": lock_id})
+                session.exec(
+                    text("SELECT pg_advisory_unlock(:id)"), params={"id": lock_id}
+                )
                 session.close()
 
     def __add_condition_statement_to_SiteProperty(

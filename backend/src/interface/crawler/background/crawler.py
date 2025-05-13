@@ -1,4 +1,3 @@
-import requests
 import time
 import threading
 
@@ -28,24 +27,22 @@ class Crawler:
                             print("[INFO] クローリング対象は存在しません。")
                         else:
                             print(f"[INFO] クローリング対象: {site_property.url}")
-                            self.crawl_service_action_page(site_property.url)
+
+                            content = self.usecase.crawl_actions_list_page(
+                                actions_list_page_property=site_property
+                            )
+                            self.crawl_service_action_page(
+                                content.content, site_property.url
+                            )
                 except Exception as e:
                     print(f"[ERROR] クローリング処理で例外2: {e}")
                 finally:
                     time.sleep(5)
 
-    def crawl_service_action_page(self, service_url: str):
-        base_url = "https://docs.aws.amazon.com/service-authorization/latest/reference/"
-        full_url = (
-            base_url + service_url[len("reference/") :]
-            if service_url.startswith("reference/")
-            else base_url + service_url
-        )
+    def crawl_service_action_page(self, content: str, service_url: str):
         try:
-            resp = requests.get(full_url, timeout=10)
-            resp.raise_for_status()
             parser = IAMActionHTMLParser()
-            parser.feed(resp.text)
+            parser.feed(content)
             # 例: 最初の3件だけ出力
             for row in parser.rows[:3]:
                 print(f"[SERVICE PAGE] {service_url} : {row}")

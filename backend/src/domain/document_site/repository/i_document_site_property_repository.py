@@ -76,6 +76,13 @@ class IDocumentSiteRepository(ABC):
         pass
 
     @abstractmethod
+    def clear_actions_pages(self) -> None:
+        """
+        Delete the specified document site property.
+        """
+        pass
+
+    @abstractmethod
     def get_document_site_content(self, document_id: str) -> DocumentSiteContent | None:
         """
         Retrieve a document site content by its ID.

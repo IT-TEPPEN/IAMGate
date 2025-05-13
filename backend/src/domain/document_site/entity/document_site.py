@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, field_serializer
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
 from enum import Enum
@@ -30,6 +30,16 @@ class DocumentSiteProperty(BaseModel):
     url: HttpUrl = Field(description="The URL of the document site.")
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    @field_serializer("url")
+    def serialize_url(self, value: HttpUrl) -> str:
+        """
+        Serialize the URL field to a string.
+
+        :param value: The URL value.
+        :return: The serialized URL as a string.
+        """
+        return str(value)
 
     @classmethod
     def new(

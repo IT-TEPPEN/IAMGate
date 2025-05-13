@@ -41,8 +41,6 @@ class AwsIamActionListLinksHTMLParser(HTMLParser):
         if not self.links:
             return []
 
-        print(f"[INFO] Links: {self.links}")
-
         return list(
             map(
                 lambda link: self.__convert_to_document_site_property(link),
@@ -61,8 +59,6 @@ class AwsIamActionListLinksHTMLParser(HTMLParser):
 
         if url.startswith("./"):
             url = url[2:]
-
-        print(f"[INFO] URL: {url}")
 
         return DocumentSiteProperty.new(
             document_type=EDocumentType.アクション一覧ページ,
