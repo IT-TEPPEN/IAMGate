@@ -39,4 +39,4 @@ def create_postgresql_engine() -> Engine:
     :return: A SQLModel engine connected to the PostgreSQL database.
     """
     url = get_postgresql_url()
-    return create_engine(url, echo=True)
+    return create_engine(url)
