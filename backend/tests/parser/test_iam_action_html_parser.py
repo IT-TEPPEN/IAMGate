@@ -7,6 +7,12 @@ from src.interface.crawler.background.parser.iam_action_html_parser import (
 def test_colspan_and_rowspan():
     html = """
     <table>
+      <thead>
+      <tr>
+        <th>Actions</th>
+        <th>Header 2</th>
+        <th>Header 3</th>
+      </thead>
       <tr>
         <td rowspan="2">A</td>
         <td>B</td>
@@ -30,6 +36,11 @@ def test_colspan_and_rowspan():
 def test_complex_colspan_rowspan():
     html = """
     <table>
+      <tr>
+        <th>Action</th>
+        <th>Header 2</th>
+        <th>Header 3</th>
+      </thead>
       <tr>
         <td rowspan="2" colspan="2">A</td>
         <td>B</td>

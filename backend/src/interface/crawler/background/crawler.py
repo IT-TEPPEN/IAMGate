@@ -43,7 +43,6 @@ class Crawler:
         try:
             parser = IAMActionHTMLParser()
             parser.feed(content)
-            # 例: 最初の3件だけ出力
             for row in parser.rows[:10]:
                 print(f"{row}")
             return parser.rows

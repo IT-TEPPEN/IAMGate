@@ -70,18 +70,19 @@ class IAMActionHTMLParser(HTMLParser):
         super().__init__()
         self.table_reader = TableReader()
         self.in_table = False
-        self.in_thead = False
+        self.in_action_table = False
+        self.in_th = False
         self.in_cell = False
         self.rows = []
 
     def handle_starttag(self, tag, attrs):
         if tag == "table":
             self.in_table = True
-        if tag == "thead":
-            self.in_thead = True
-        if self.in_table and not self.in_thead and tag == "tr":
+        if tag == "th":
+            self.in_th = True
+        if self.in_table and self.in_action_table and tag == "tr":
             self.table_reader.create_row()
-        if self.in_table and not self.in_thead and tag == "td":
+        if self.in_table and self.in_action_table and tag == "td":
             self.in_cell = True
             rowspan = 1
             colspan = 1
@@ -91,19 +92,25 @@ class IAMActionHTMLParser(HTMLParser):
                 if attr[0] == "colspan":
                     colspan = int(attr[1])
             self.table_reader.create_cell(rowspan=rowspan, colspan=colspan)
-        if self.in_table and not self.in_thead and tag == "a":
+        if self.in_table and self.in_action_table and tag == "a":
             link = attrs[0][1] if attrs else ""
             self.table_reader.add_link(link)
 
     def handle_endtag(self, tag):
         if tag == "table":
+            if self.in_action_table:
+                self.rows = self.table_reader.get_cells()
+
             self.in_table = False
-            self.rows = self.table_reader.get_cells()
-        if tag == "thead":
-            self.in_thead = False
+            self.in_action_table = False
+        if tag == "th":
+            self.in_th = False
         if tag == "td":
             self.in_cell = False
 
     def handle_data(self, data):
+        if self.in_th:
+            if data.strip().lower() == "action" or data.strip().lower() == "actions":
+                self.in_action_table = True
         if self.in_table and self.in_cell and data.strip() and data != " ":
             self.table_reader.add_data(data.strip())
