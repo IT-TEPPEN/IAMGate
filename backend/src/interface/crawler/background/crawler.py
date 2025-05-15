@@ -5,8 +5,6 @@ from . import exc
 
 from src.usecase.document_site import IDocumentSiteUseCase
 
-CRAWL_URL = "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
-
 
 class Crawler:
     def __init__(self, usecase: IDocumentSiteUseCase):
@@ -63,6 +61,3 @@ class CrawlerHandler:
         )
         self.crawler_thread = threading.Thread(target=crawler.run, daemon=True)
         self.crawler_thread.start()
-
-    def get_status(self):
-        return self.crawler_thread is not None and self.crawler_thread.is_alive()
