@@ -41,3 +41,13 @@ class DocumentSiteAdapter(IDocumentSiteAdapter):
 
         self.aws_iam_actions_list_links_parser.feed(response.text)
         return self.aws_iam_actions_list_links_parser.get_actions_site_properties()
+
+    def extract_service_action_page_properties(self, content):
+        """
+        Extract service action page properties from the content.
+
+        :param content: The document site content.
+        :return: A list of service action page properties.
+        """
+        self.aws_iam_actions_list_links_parser.feed(content.content)
+        return self.aws_iam_actions_list_links_parser.get_actions_site_properties()

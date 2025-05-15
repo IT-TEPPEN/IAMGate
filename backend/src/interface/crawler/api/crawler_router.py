@@ -1,12 +1,10 @@
 from fastapi import APIRouter, HTTPException
 
-from ..background import CrawlerHandler
-from src.usecase.document_site import IDocumentSiteUseCase, dto, exc
+from src.usecase.document_site import IDocumentSiteUseCase, dto
 
 
 def setup_crawler_router(
     parent_router: APIRouter,
-    crawlerHandler: CrawlerHandler,
     usecase: IDocumentSiteUseCase,
 ) -> APIRouter:
     """
@@ -14,19 +12,25 @@ def setup_crawler_router(
 
     :param usecase: The use case to be used by the crawler handler.
     """
-    status_router = APIRouter(prefix="/crawler-status")
+    authorization_roueer = APIRouter(prefix="/service-authorization/aws-iam/actions")
+    document_roueer = APIRouter(prefix="/service-authorization/aws-iam/document-pages")
+    crawler_roueer = APIRouter(
+        prefix="/service-authorization/aws-iam/document-crawling-conditions"
+    )
+
     target_router = APIRouter(prefix="/crawler-targets")
 
-    @status_router.get("")
-    def crawler_status():
-        return {"running": crawlerHandler.get_status()}
-
-    @target_router.get("")
+    @document_roueer.get("")
     def crawler_targets():
         pages = usecase.list_actions_pages()
         return {"page_count": len(pages), "targets": pages}
 
-    @target_router.get("/{document_id}")
+    @crawler_roueer.get("")
+    def crawler_target_list():
+        pages = usecase.list_crawling_targets()
+        return {"page_count": len(pages), "targets": pages}
+
+    @crawler_roueer.get("/{document_id}")
     def crawler_target(document_id: str):
         target = usecase.get_crawling_target(document_id=document_id)
 
@@ -35,7 +39,7 @@ def setup_crawler_router(
 
         return target
 
-    @target_router.put("/{document_id}")
+    @crawler_roueer.put("/{document_id}")
     def crawler_target_update(document_id: str):
         try:
             target = usecase.add_crawling_target(
@@ -61,5 +65,6 @@ def setup_crawler_router(
     #     usecase.clear_actions_pages()
     #     return {"message": "Deleted all action list page properties."}
 
-    parent_router.include_router(target_router)
-    parent_router.include_router(status_router)
+    authorization_roueer.include_router(target_router)
+    authorization_roueer.include_router(crawler_roueer)
+    parent_router.include_router(authorization_roueer)

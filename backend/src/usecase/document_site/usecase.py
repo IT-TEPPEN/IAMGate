@@ -1,5 +1,6 @@
 from .i_usecase import IDocumentSiteUseCase
 from . import dto, exc
+from datetime import datetime, timedelta, timezone
 
 from src.domain.document_site.entity import (
     DocumentSiteProperty,
@@ -73,7 +74,7 @@ class DocumentSiteUseCase(IDocumentSiteUseCase):
 
         return response_dto
 
-    def update_actions_list_page_properties(self):
+    def update_actions_list_page_properties(self, interval_minutes=1440):
         """
         Update the action list page properties.
 
@@ -96,10 +97,41 @@ class DocumentSiteUseCase(IDocumentSiteUseCase):
         else:
             top_document_site_property = document_site_properties[0]
 
+        # Get the document site content
+        top_document_site_content = (
+            self.document_site_repository.get_document_site_content(
+                document_id=top_document_site_property.id
+            )
+        )
+
+        if top_document_site_content is not None:
+            # Check if the content is older than the interval
+            if top_document_site_content.acquired_at > datetime.now(
+                tz=timezone.utc
+            ) - timedelta(minutes=interval_minutes):
+                print(
+                    f"[INFO] Document site content is up to date. Skipping update.\n - URL: {top_document_site_property.url}"
+                )
+                return
+
+        document_site_content = self.document_site_adapter.get_document(
+            property=top_document_site_property
+        )
+
+        if document_site_content is None:
+            raise exc.FailToGetContentException(
+                f"Document site content not found for\n - property ID: {str(top_document_site_property.id)}\n - URL: {top_document_site_property.url}"
+            )
+
+        # Save the document site content
+        self.document_site_repository.save_document_site_content(
+            document_site_content=document_site_content,
+        )
+
         # Get the action list page properties
-        action_list_page_properties = list(
-            self.document_site_adapter.get_aws_iam_actions_page_properties(
-                top_page_property=top_document_site_property
+        action_list_page_properties = (
+            self.document_site_adapter.extract_service_action_page_properties(
+                content=document_site_content
             )
         )
 

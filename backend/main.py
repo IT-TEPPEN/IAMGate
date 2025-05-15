@@ -38,7 +38,7 @@ def setup() -> FastAPI:
     app = FastAPI(lifespan=lifespan)
     router_v1 = APIRouter()
 
-    setup_crawler_router(router_v1, crawlerHandler, usecase)
+    setup_crawler_router(router_v1, usecase)
 
     # Include routers
     app.include_router(router_v1, prefix="/api/v1", tags=["v1"])

@@ -30,3 +30,15 @@ class IDocumentSiteAdapter(ABC):
         :return: A list of AWS IAM action list URLs.
         """
         pass
+
+    @abstractmethod
+    def extract_service_action_page_properties(
+        self, content: DocumentSiteContent
+    ) -> list[DocumentSiteProperty]:
+        """
+        Extract service action page properties from the content.
+
+        :param content: The document site content to extract the properties from.
+        :return: A list of service action page properties.
+        """
+        pass

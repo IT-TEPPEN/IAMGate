@@ -1,5 +1,5 @@
 from sqlmodel import Field, SQLModel
-from sqlalchemy import TEXT, Column
+from sqlalchemy import TEXT, Column, DateTime
 from uuid import UUID
 from datetime import datetime
 
@@ -14,7 +14,9 @@ class MSiteContent(SQLModel, table=True):
     id: UUID = Field(primary_key=True)
     version: int = Field(primary_key=True)
     content: str = Field(sa_column=Column(TEXT))
-    acquired_at: datetime = Field(nullable=False)
+    acquired_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False)
+    )
 
     @classmethod
     def new(
