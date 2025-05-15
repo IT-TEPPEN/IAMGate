@@ -64,7 +64,7 @@ WORKDIR /app/backend
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Configure Nginx
-COPY <<EOF /etc/nginx/conf.d/default.conf
+RUN <<EOF > /etc/nginx/conf.d/default.conf
 server {
     listen 80;
     server_name localhost;
