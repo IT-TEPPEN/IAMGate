@@ -2,7 +2,6 @@ import time
 import threading
 
 from . import exc
-from .parser import IAMActionHTMLParser
 
 from src.usecase.document_site import IDocumentSiteUseCase
 
