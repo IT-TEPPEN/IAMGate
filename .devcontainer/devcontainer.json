@@ -23,7 +23,8 @@
         "bierner.markdown-preview-github-styles",
         "bierner.markdown-mermaid",
         "ms-python.python",
-        "ms-python.black-formatter"
+        "ms-python.black-formatter",
+        "LittleFoxTeam.vscode-python-test-adapter"
       ],
       "settings": {
         "editor.formatOnSave": true,
@@ -37,11 +38,11 @@
           ["tv\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
         ],
         "python.analysis.extraPaths": [
-          "/workspace/auth-api/venv/lib/python3.10/site-packages"
+          "/workspaces/backend/venv/lib/python3.12/site-packages"
         ],
-        "black-formatter.cwd": "/workspace/auth-api",
-        "black-formatter.path": ["/workspace/auth-api/venv/bin/black"],
-        "black-formatter.interpreter": ["/workspace/auth-api/venv/bin/python"],
+        "black-formatter.cwd": "/workspaces/backend",
+        "black-formatter.path": ["/workspaces/backend/venv/bin/black"],
+        "black-formatter.interpreter": ["/workspaces/backend/venv/bin/python"],
         "markdown-preview-github-styles.colorTheme": "light",
         "[typescript]": {
           "editor.defaultFormatter": "esbenp.prettier-vscode",

@@ -13,6 +13,11 @@ services:
     depends_on: # Add dependency on the db service
       - db
     environment: # Add environment variables for the app service
+      - DB_HOST=db
+      - DB_NAME=iamgate
+      - DB_PORT=5432
+      - DB_USER=iamgate_user
+      - DB_PASSWORD=iamgate_password
       - DATABASE_URL=postgres://iamgate_user:iamgate_password@db:5432/iamgate?sslmode=disable
 
   db: # Add the database service
