@@ -22,6 +22,7 @@ def setup() -> FastAPI:
     usecase = DocumentSiteUseCase(
         document_site_repository=infra.document_site_repository,
         document_site_adapter=infra.document_site_adapter,
+        service_action_adapter=infra.service_action_adapter,
     )
     crawlerHandler = CrawlerHandler(usecase)
 

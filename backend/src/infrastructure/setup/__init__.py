@@ -1,6 +1,7 @@
 from .interface import Infrastructure
 from .postgresql import setup_postgresql_infrastructure
 from ..site.adapter import DocumentSiteAdapter
+from ..service_action.adapter import ServiceActionAdapter
 from src.environment import DB_TYPE
 
 
@@ -25,6 +26,7 @@ def setup_infrastructure() -> Infrastructure:
         return Infrastructure(
             document_site_repository=repo,
             document_site_adapter=DocumentSiteAdapter(),
+            service_action_adapter=ServiceActionAdapter(),
         )
 
     else:

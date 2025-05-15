@@ -12,12 +12,9 @@ def setup_crawler_router(
 
     :param usecase: The use case to be used by the crawler handler.
     """
-    authorization_roueer = APIRouter(prefix="/service-authorization/aws-iam/actions")
-    document_roueer = APIRouter(prefix="/service-authorization/aws-iam/document-pages")
-    crawler_roueer = APIRouter(
-        prefix="/service-authorization/aws-iam/document-crawling-conditions"
-    )
-
+    authorization_roueer = APIRouter(prefix="/service-authorization/aws-iam")
+    document_roueer = APIRouter(prefix="/document-pages")
+    crawler_roueer = APIRouter(prefix="/document-crawling-conditions")
     target_router = APIRouter(prefix="/crawler-targets")
 
     @document_roueer.get("")
@@ -65,6 +62,7 @@ def setup_crawler_router(
     #     usecase.clear_actions_pages()
     #     return {"message": "Deleted all action list page properties."}
 
+    authorization_roueer.include_router(document_roueer)
     authorization_roueer.include_router(target_router)
     authorization_roueer.include_router(crawler_roueer)
     parent_router.include_router(authorization_roueer)

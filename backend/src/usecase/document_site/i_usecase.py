@@ -3,8 +3,10 @@ from contextlib import AbstractContextManager
 from . import dto
 from src.domain.document_site.entity import (
     DocumentSiteProperty,
+    DocumentSiteContent,
     DocumentSiteCrawlingCondition,
 )
+from src.domain.service_action.entity import ServiceActions
 from typing import List
 
 
@@ -94,5 +96,12 @@ class IDocumentSiteUseCase(ABC):
     def delete_crawling_target(self, document_id: str) -> None:
         """
         Delete a crawling target by its ID.
+        """
+        pass
+
+    @abstractmethod
+    def get_service_actions_from_content(self, content: str) -> ServiceActions:
+        """
+        Get the service actions from the content.
         """
         pass

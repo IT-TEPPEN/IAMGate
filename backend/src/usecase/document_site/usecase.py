@@ -9,6 +9,7 @@ from src.domain.document_site.entity import (
 )
 from src.domain.document_site.repository import IDocumentSiteRepository
 from src.domain.document_site.adapter import IDocumentSiteAdapter
+from src.domain.service_action.adapter import IServiceActionAdapter
 
 from src.domain.share.value_object import VSearchCondition
 
@@ -22,15 +23,18 @@ class DocumentSiteUseCase(IDocumentSiteUseCase):
         self,
         document_site_repository: IDocumentSiteRepository,
         document_site_adapter: IDocumentSiteAdapter,
+        service_action_adapter: IServiceActionAdapter,
     ) -> None:
         """
         Initialize the DocumentSiteUseCase.
 
         :param document_site_repository: The document site repository.
         :param document_site_adapter: The document site adapter.
+        :param service_action_adapter: The service action adapter.
         """
         self.document_site_repository = document_site_repository
         self.document_site_adapter = document_site_adapter
+        self.service_action_adapter = service_action_adapter
 
     def get_document_top_site(self):
         """
@@ -235,7 +239,9 @@ class DocumentSiteUseCase(IDocumentSiteUseCase):
         List all crawling targets.
         :return: A list of crawling targets.
         """
-        crawling_targets = self.document_site_repository.list_crawling_site_conditions()
+        crawling_targets = self.document_site_repository.list_crawling_site_conditions(
+            EDocumentType.アクション一覧ページ
+        )
 
         return crawling_targets
 
@@ -262,3 +268,18 @@ class DocumentSiteUseCase(IDocumentSiteUseCase):
         """
         # Delete the crawling condition
         self.document_site_repository.delete_crawling_site_condition(document_id)
+
+    def get_service_actions_from_content(self, content):
+        """
+        Get service actions from the content.
+
+        :param content: The document site content.
+        """
+        # Get the service actions
+        service_actions = (
+            self.service_action_adapter.extract_service_actions_from_content(
+                content=content
+            )
+        )
+
+        return service_actions

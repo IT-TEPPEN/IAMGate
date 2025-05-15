@@ -20,39 +20,35 @@ class Crawler:
             except Exception as e:
                 print(f"[ERROR] クローリング処理で例外1: {e}")
 
-            for i in range(1440):
-                try:
-                    with self.usecase.get_actions_list_page_property_crawling() as site_property:
-                        if site_property is None:
-                            print("[INFO] クローリング対象は存在しません。")
-                        else:
-                            print(f"[INFO] クローリング対象: {site_property.url}")
+            try:
+                with self.usecase.get_actions_list_page_property_crawling() as site_property:
+                    if site_property is None:
+                        print("[INFO] クローリング対象は存在しません。")
+                    else:
+                        print(f"[INFO] クローリング対象: {site_property.url}")
 
-                            content = self.usecase.crawl_actions_list_page(
-                                actions_list_page_property=site_property
-                            )
-                            self.crawl_service_action_page(
-                                content.content, site_property.url
-                            )
-                except Exception as e:
-                    print(f"[ERROR] クローリング処理で例外2: {e}")
-                finally:
-                    time.sleep(5)
+                        content = self.usecase.crawl_actions_list_page(
+                            actions_list_page_property=site_property
+                        )
+                        service_actions = self.usecase.get_service_actions_from_content(
+                            content.content
+                        )
 
-    def crawl_service_action_page(self, content: str, service_url: str):
-        try:
-            parser = IAMActionHTMLParser()
-            parser.feed(content)
-            print(f"[INFO] Service Name   : {parser.service_name}")
-            print(f"[INFO] Service Prefix : {parser.service_prefix}")
-            for row in parser.rows[:10]:
-                print(f"{row}")
-            return parser.rows
-        except Exception as e:
-            print(
-                f"[ERROR] サービスアクションページ({service_url})のクローリング失敗: {e}"
-            )
-            return []
+                        print(f"[INFO] Service Name   : {service_actions.service_name}")
+                        print(f"[INFO] Service Prefix : {service_actions.id}")
+                        print(
+                            f"[INFO] Service Actions: {len(service_actions.service_actions)}"
+                        )
+                        for action in service_actions.service_actions[:10]:
+                            print(f"[INFO] Action Code: {action.id}")
+                            print(f"[INFO] Action Name: {action.action_name}")
+                            print(f"[INFO] Action URL : {action.action_url}")
+                            print(f"[INFO] Description: {action.description}")
+                            print(f"[INFO] Access Level: {action.access_level}")
+            except Exception as e:
+                print(f"[ERROR] クローリング処理で例外2: {e}")
+            finally:
+                time.sleep(10)
 
 
 class CrawlerHandler:
