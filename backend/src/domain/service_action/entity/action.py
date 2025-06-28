@@ -1,5 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum
+from datetime import datetime, timezone
+from typing import Optional
 
 
 class EAccessLevel(str, Enum):
@@ -25,6 +27,10 @@ class ServiceAction(BaseModel):
     action_url: str
     description: str
     access_level: EAccessLevel
+    resource_types: list[str] = Field(default_factory=list)
+    condition_keys: list[str] = Field(default_factory=list)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     @classmethod
     def new(
@@ -34,6 +40,8 @@ class ServiceAction(BaseModel):
         action_url: str,
         description: str,
         access_level: str,
+        resource_types: Optional[list[str]] = None,
+        condition_keys: Optional[list[str]] = None,
     ) -> "ServiceAction":
         """
         Create a new instance of ServiceAction.
@@ -43,6 +51,8 @@ class ServiceAction(BaseModel):
         :param action_url: The URL of the action.
         :param description: The description of the action.
         :param access_level: The access level of the action.
+        :param resource_types: The resource types for the action.
+        :param condition_keys: The condition keys for the action.
         :return: An instance of ServiceAction.
         """
         return ServiceAction(
@@ -51,7 +61,9 @@ class ServiceAction(BaseModel):
             action_name=action_name,
             action_url=action_url,
             description=description,
-            access_level=access_level,
+            access_level=EAccessLevel(access_level),
+            resource_types=resource_types or [],
+            condition_keys=condition_keys or [],
         )
 
     @classmethod
@@ -63,6 +75,10 @@ class ServiceAction(BaseModel):
         action_url: str,
         description: str,
         access_level: str,
+        resource_types: Optional[list[str]] = None,
+        condition_keys: Optional[list[str]] = None,
+        created_at: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
     ) -> "ServiceAction":
         """
         Reconstruct an instance of ServiceAction.
@@ -73,13 +89,22 @@ class ServiceAction(BaseModel):
         :param action_url: The URL of the action.
         :param description: The description of the action.
         :param access_level: The access level of the action.
+        :param resource_types: The resource types for the action.
+        :param condition_keys: The condition keys for the action.
+        :param created_at: The creation timestamp.
+        :param updated_at: The update timestamp.
         :return: An instance of ServiceAction.
         """
+        now = datetime.now(timezone.utc)
         return ServiceAction(
             id=id,
             service_prefix=service_prefix,
             action_name=action_name,
             action_url=action_url,
             description=description,
-            access_level=access_level,
+            access_level=EAccessLevel(access_level),
+            resource_types=resource_types or [],
+            condition_keys=condition_keys or [],
+            created_at=created_at or now,
+            updated_at=updated_at or now,
         )
