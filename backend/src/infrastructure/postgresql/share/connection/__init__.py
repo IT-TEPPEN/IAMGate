@@ -1,10 +1,8 @@
-from .postgresql import create_postgresql_engine
+from .postgresql import create_postgresql_engine, get_postgresql_url
 
 from src.environment import DB_TYPE
 
-__all__ = [
-    "get_engine",
-]
+__all__ = ["get_engine", "get_postgresql_url"]
 
 
 def get_engine():
