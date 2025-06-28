@@ -48,3 +48,35 @@ class VServiceActionSearchCriteria(BaseModel):
             and len(self.action_name) > 500):
             return False
         return True
+
+    @classmethod
+    def new(
+        cls,
+        service_name: Optional[str] = None,
+        action_name: Optional[str] = None,
+        action_name_match: EActionNameMatch = EActionNameMatch.partial,
+        description: Optional[str] = None,
+        access_level: Optional[EAccessLevel] = None,
+        updated_after: Optional[datetime] = None,
+        updated_before: Optional[datetime] = None,
+        limit: int = 100,
+        offset: int = 0,
+        sort: str = "id",
+        order: EOrder = EOrder.asc,
+        count_only: bool = False,
+    ) -> "VServiceActionSearchCriteria":
+        """新しい検索条件を作成"""
+        return cls(
+            service_name=service_name,
+            action_name=action_name,
+            action_name_match=action_name_match,
+            description=description,
+            access_level=access_level,
+            updated_after=updated_after,
+            updated_before=updated_before,
+            limit=limit,
+            offset=offset,
+            sort=sort,
+            order=order,
+            count_only=count_only,
+        )
