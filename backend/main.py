@@ -2,15 +2,16 @@ from fastapi import FastAPI, APIRouter
 from contextlib import asynccontextmanager
 from src.interface.crawler.api import setup_crawler_router
 from src.infrastructure import setup_infrastructure
-from src.infrastructure.share.connection import get_engine
-from sqlmodel import SQLModel
+
+# from src.infrastructure.share.connection import get_engine
+# from sqlmodel import SQLModel
 
 from src.usecase.document_site import DocumentSiteUseCase
 from src.interface.crawler.background import CrawlerHandler
 
 
-def create_db_and_tables():
-    SQLModel.metadata.create_all(get_engine())
+# def create_db_and_tables():
+#     SQLModel.metadata.create_all(get_engine())
 
 
 def setup() -> FastAPI:
@@ -29,7 +30,7 @@ def setup() -> FastAPI:
     # lifespanイベントハンドラでDB初期化
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        create_db_and_tables()
+        # create_db_and_tables()
 
         crawlerHandler.start()
 

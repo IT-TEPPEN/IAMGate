@@ -12,6 +12,7 @@ class MServiceAction(SQLModel, table=True):
 
     id: str = Field(primary_key=True, max_length=255)
     service_prefix: str = Field(max_length=100, index=True)
+    service_name: str = Field(max_length=255, index=True)
     action_name: str = Field(max_length=255, index=True)
     action_url: str = Field(sa_column=Column(Text))
     description: str = Field(sa_column=Column(Text))
@@ -49,6 +50,7 @@ class MServiceAction(SQLModel, table=True):
         return cls(
             id=service_action.id,
             service_prefix=service_action.service_prefix,
+            service_name=service_action.service_name,
             action_name=service_action.action_name,
             action_url=service_action.action_url,
             description=service_action.description,
@@ -68,6 +70,7 @@ class MServiceAction(SQLModel, table=True):
         return ServiceAction.reconstruct(
             id=self.id,
             service_prefix=self.service_prefix,
+            service_name=self.service_name,
             action_name=self.action_name,
             action_url=self.action_url,
             description=self.description,

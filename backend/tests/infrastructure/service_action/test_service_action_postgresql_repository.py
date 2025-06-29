@@ -56,6 +56,7 @@ def sample_service_action() -> ServiceAction:
     """テスト用のServiceActionを作成"""
     return ServiceAction.new(
         service_prefix="s3",
+        service_name="Amazon S3",
         action_name="GetObject",
         action_url="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html",
         description="Retrieves objects from Amazon S3",

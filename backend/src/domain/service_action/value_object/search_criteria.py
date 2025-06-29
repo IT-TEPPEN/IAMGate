@@ -24,6 +24,7 @@ class VServiceActionSearchCriteria(BaseModel):
     """Service Action検索条件の値オブジェクト"""
 
     # 検索条件
+    service_prefix: Optional[str] = None
     service_name: Optional[str] = None
     action_name: Optional[str] = None
     action_name_match: EActionNameMatch = EActionNameMatch.partial
@@ -56,6 +57,7 @@ class VServiceActionSearchCriteria(BaseModel):
     @classmethod
     def new(
         cls,
+        service_prefix: Optional[str] = None,
         service_name: Optional[str] = None,
         action_name: Optional[str] = None,
         action_name_match: EActionNameMatch = EActionNameMatch.partial,
@@ -71,6 +73,7 @@ class VServiceActionSearchCriteria(BaseModel):
     ) -> "VServiceActionSearchCriteria":
         """新しい検索条件を作成"""
         return cls(
+            service_prefix=service_prefix,
             service_name=service_name,
             action_name=action_name,
             action_name_match=action_name_match,

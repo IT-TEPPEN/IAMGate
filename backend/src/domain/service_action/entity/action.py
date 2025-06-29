@@ -23,6 +23,7 @@ class EAccessLevel(str, Enum):
 class ServiceAction(BaseModel):
     id: str
     service_prefix: str
+    service_name: str
     action_name: str
     action_url: str
     description: str
@@ -36,6 +37,7 @@ class ServiceAction(BaseModel):
     def new(
         cls,
         service_prefix: str,
+        service_name: str,
         action_name: str,
         action_url: str,
         description: str,
@@ -46,7 +48,8 @@ class ServiceAction(BaseModel):
         """
         Create a new instance of ServiceAction.
 
-        :param service_prefix: The prefix of the service.
+        :param service_prefix: The prefix of the service (e.g., 's3', 'ec2').
+        :param service_name: The official name of the service (e.g., 'Amazon S3', 'Amazon EC2').
         :param action_name: The name of the action.
         :param action_url: The URL of the action.
         :param description: The description of the action.
@@ -58,6 +61,7 @@ class ServiceAction(BaseModel):
         return ServiceAction(
             id=f"{service_prefix}:{action_name}",
             service_prefix=service_prefix,
+            service_name=service_name,
             action_name=action_name,
             action_url=action_url,
             description=description,
@@ -71,6 +75,7 @@ class ServiceAction(BaseModel):
         cls,
         id: str,
         service_prefix: str,
+        service_name: str,
         action_name: str,
         action_url: str,
         description: str,
@@ -84,7 +89,8 @@ class ServiceAction(BaseModel):
         Reconstruct an instance of ServiceAction.
 
         :param id: The unique identifier for the service action.
-        :param service_prefix: The prefix of the service.
+        :param service_prefix: The prefix of the service (e.g., 's3', 'ec2').
+        :param service_name: The official name of the service (e.g., 'Amazon S3', 'Amazon EC2').
         :param action_name: The name of the action.
         :param action_url: The URL of the action.
         :param description: The description of the action.
@@ -99,6 +105,7 @@ class ServiceAction(BaseModel):
         return ServiceAction(
             id=id,
             service_prefix=service_prefix,
+            service_name=service_name,
             action_name=action_name,
             action_url=action_url,
             description=description,

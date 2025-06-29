@@ -150,13 +150,22 @@ class ServiceActionPostgreSQLRepository(IServiceActionRepository):
         # 検索条件を適用
         conditions = []
 
-        # service_nameでの検索はservice_prefixでの検索として扱う
-        if criteria.service_name:
-            # SQLModel/SQLAlchemyの正しい方法でlike検索
+        # service_prefixでの検索（IAMアクションプレフィックス: s3, ec2など）
+        if criteria.service_prefix:
             from sqlalchemy import func
 
             conditions.append(
                 func.lower(MServiceAction.service_prefix).like(
+                    f"%{criteria.service_prefix.lower()}%"
+                )
+            )
+
+        # service_nameでの検索（公式サービス名: Amazon S3, Amazon EC2など）
+        if criteria.service_name:
+            from sqlalchemy import func
+
+            conditions.append(
+                func.lower(MServiceAction.service_name).like(
                     f"%{criteria.service_name.lower()}%"
                 )
             )
