@@ -3,6 +3,6 @@ from .model import MServiceAction
 
 
 __all__ = [
-    "ServiceActionPostgreSQLRepository", 
+    "ServiceActionPostgreSQLRepository",
     "MServiceAction",
 ]

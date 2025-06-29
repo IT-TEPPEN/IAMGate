@@ -4,6 +4,6 @@ from .service import ServiceActions
 
 __all__ = [
     "ServiceAction",
-    "ServiceActions", 
+    "ServiceActions",
     "EAccessLevel",
 ]

@@ -3,6 +3,6 @@ from .search_criteria import VServiceActionSearchCriteria, EActionNameMatch, EOr
 
 __all__ = [
     "VServiceActionSearchCriteria",
-    "EActionNameMatch", 
+    "EActionNameMatch",
     "EOrder",
 ]

@@ -7,7 +7,7 @@ __all__ = [
     "ServiceAction",
     "ServiceActions",
     "EAccessLevel",
-    "IServiceActionRepository", 
+    "IServiceActionRepository",
     "VServiceActionSearchCriteria",
     "EActionNameMatch",
     "EOrder",

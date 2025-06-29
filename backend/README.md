@@ -46,16 +46,16 @@ make docker-test
 
 ## Makeコマンド一覧
 
-| コマンド | 説明 |
-|----------|------|
-| `make help` | 利用可能なコマンドを表示 |
-| `make venv` | Python仮想環境を作成 |
-| `make install` | 依存関係をインストール |
-| `make setup` | 開発環境の初期セットアップ |
-| `make test` | 基本テストを実行 |
-| `make test-repo` | リポジトリテスト（PostgreSQL付き）を実行 |
-| `make clean` | コンテナとキャッシュをクリーンアップ |
-| `make docker-test` | Docker環境でテストを実行 |
+| コマンド           | 説明                                     |
+| ------------------ | ---------------------------------------- |
+| `make help`        | 利用可能なコマンドを表示                 |
+| `make venv`        | Python仮想環境を作成                     |
+| `make install`     | 依存関係をインストール                   |
+| `make setup`       | 開発環境の初期セットアップ               |
+| `make test`        | 基本テストを実行                         |
+| `make test-repo`   | リポジトリテスト（PostgreSQL付き）を実行 |
+| `make clean`       | コンテナとキャッシュをクリーンアップ     |
+| `make docker-test` | Docker環境でテストを実行                 |
 
 ## プロジェクト構造
 

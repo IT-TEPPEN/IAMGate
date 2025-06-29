@@ -20,7 +20,9 @@ class IServiceActionRepository(ABC):
         pass
 
     @abstractmethod
-    def get_service_actions(self, criteria: VServiceActionSearchCriteria) -> list[ServiceAction]:
+    def get_service_actions(
+        self, criteria: VServiceActionSearchCriteria
+    ) -> list[ServiceAction]:
         """
         検索条件に基づいてService Actionの一覧を取得
 
