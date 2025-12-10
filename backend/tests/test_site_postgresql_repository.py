@@ -33,7 +33,23 @@ def pg_engine():
         f"postgresql://iamgate_user:iamgate_password@db:5432/{db_name}", echo=False
     )
     SQLModel.metadata.create_all(engine)
-    return engine
+
+    yield engine
+
+    with admin_engine.connect() as conn:
+        # テストDBを削除
+        # まず接続を切る
+        conn.execute(
+            text(
+                f"""
+            SELECT pg_terminate_backend(pg_stat_activity.pid)
+            FROM pg_stat_activity
+            WHERE pg_stat_activity.datname = '{db_name}'
+              AND pid <> pg_backend_pid();
+            """
+            )
+        )
+        conn.execute(text(f"DROP DATABASE IF EXISTS {db_name}"))
 
 
 def insert_property_with_condition_and_content(
@@ -51,8 +67,7 @@ def insert_property_with_condition_and_content(
     session.commit()  # まず親テーブルを確定
     cond = MSiteCrawlingCondition(
         site_property_id=prop_id,
-        force_crawl=force_crawl,
-        should_crawl=should_crawl,
+        is_active=True,
         crawl_interval_minutes=60,
         created_at=datetime.now(timezone.utc),
         updated_at=datetime.now(timezone.utc),
