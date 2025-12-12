@@ -44,11 +44,18 @@ export const documentApi = {
   /**
    * クローリング対象を追加・更新
    */
+  /**
+   * クローリング対象を追加・更新
+   * @param documentId - ドキュメントID
+   * @param options - クローリング設定オプション（例: { crawl_interval: number }）
+   */
   async addCrawlingTarget(
-    documentId: string
+    documentId: string,
+    options?: { crawl_interval?: number }
   ): Promise<DocumentSiteCrawlingCondition> {
     return apiClient.put<DocumentSiteCrawlingCondition>(
-      `${BASE_PATH}/document-crawling-conditions/${documentId}`
+      `${BASE_PATH}/document-crawling-conditions/${documentId}`,
+      options
     );
   },
 
