@@ -39,7 +39,7 @@ def setup() -> FastAPI:
     # Create the FastAPI application
     app = FastAPI(lifespan=lifespan)
     
-    # CORS設定
+    # CORS settings
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
