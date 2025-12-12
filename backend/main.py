@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from src.interface.crawler.api import setup_crawler_router
 from src.infrastructure import setup_infrastructure
@@ -37,6 +38,16 @@ def setup() -> FastAPI:
 
     # Create the FastAPI application
     app = FastAPI(lifespan=lifespan)
+    
+    # CORS settings
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    
     router_v1 = APIRouter()
 
     setup_crawler_router(router_v1, usecase)

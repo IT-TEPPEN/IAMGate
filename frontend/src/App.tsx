@@ -1,24 +1,25 @@
-import { useState } from "react";
+/**
+ * Appコンポーネント
+ * ルーティング設定
+ */
+
+import { BrowserRouter, Routes, Route } from "react-router";
+import { Layout } from "./components/Layout";
+import { HomePage } from "./pages/HomePage";
+import { DocumentPagesPage } from "./pages/DocumentPagesPage";
+import { CrawlingTargetsPage } from "./pages/CrawlingTargetsPage";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
-      <div></div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<HomePage />} />
+          <Route path="documents" element={<DocumentPagesPage />} />
+          <Route path="crawling-targets" element={<CrawlingTargetsPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
